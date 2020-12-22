@@ -142,6 +142,7 @@ def chooseTeam():
 
 def chooseLineup(lineup):
     starting = []
+    rating = 0
     while True:
         choice = int(
             input("1-add player, 2-remove player, 3-display lineup, 4-save lineup")
@@ -153,8 +154,15 @@ def chooseLineup(lineup):
             number = int(input("Enter player's number"))
             starting.pop(number)
         elif choice == 4:
-            print(lineup)
-            break
+            if len(starting) < 11:
+                print("Not enough players. Add ", 11 - len(starting), " more.")
+            else:
+                for i in starting:
+                    rating = rating + int(i["RATING"])
+                rating = rating / 11
+                print(starting, " ", rating)
+                return (starting, rating)
+                break
         else:
             print(starting)
 
