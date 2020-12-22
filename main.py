@@ -104,6 +104,23 @@ def getMatchday(current_manager):
             break
 
 
+def playersFromTeam(team):
+    number = 0
+    rating = 0
+    players = []
+    for i in bundesliga_db:
+        if i["CLUB"] == team:
+            number = number + 1
+            players.append(i)
+            print(number, " ", i["NAME"], " ", i["POSITION"])
+            rating = rating + int(i["RATING"])
+    rating = rating / number
+    players = players
+    return (players, rating)
+    # return rating
+    # players.clear()
+
+
 def getTeam(current_manager):
     file = open("manager.json")
     file = json.load(file)
@@ -123,23 +140,7 @@ def chooseTeam():
     return team
 
 
-def playersFromTeam(team):
-    number = 0
-    rating = 0
-    players = []
-    for i in bundesliga_db:
-        if i["CLUB"] == team:
-            number = number + 1
-            players.append(i)
-            # print(number, ' ', i['NAME'], ' ', i['POSITION'])
-            rating = rating + int(i["RATING"])
-    rating = rating / number
-    # return players
-    return rating
-    players.clear()
-
-
-def chooseLineup(team):
+def chooseLineup(lineup):
     starting = []
     while True:
         choice = int(
@@ -152,7 +153,7 @@ def chooseLineup(team):
             number = int(input("Enter player's number"))
             starting.pop(number)
         elif choice == 4:
-            print(starting)
+            print(lineup)
             break
         else:
             print(starting)
@@ -211,6 +212,7 @@ def nextGame(matchday, current_team):
 # nextGame(matchday, current_team)
 # print(current_team)
 team = chooseTeam()
-playersFromTeam(team)
-chooseLineup(team)
-print(lineup)
+pl = playersFromTeam(team)
+# pl = Squad(team).returnRating(team)
+chooseLineup(lineup=pl[0])
+# print(pl[0])
