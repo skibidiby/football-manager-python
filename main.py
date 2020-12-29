@@ -65,7 +65,7 @@ class Fixture(object):
         return fixtures
 
 
-lineup = []
+squad = []
 teams = []
 # manager = Manager("vikic", "Borussia Dortumnd", "123123", 1)
 # Manager.saveData(manager)
@@ -112,7 +112,7 @@ def playersFromTeam(team):
         if i["CLUB"] == team:
             number = number + 1
             players.append(i)
-            print(number, " ", i["NAME"], " ", i["POSITION"])
+            # print(number, " ", i["NAME"], " ", i["POSITION"])
             rating = rating + int(i["RATING"])
     rating = rating / number
     players = players
@@ -140,31 +140,33 @@ def chooseTeam():
     return team
 
 
-def chooseLineup(lineup):
-    starting = []
+def chooseLineup(squad):
+    lineup = []
     rating = 0
     while True:
         choice = int(
             input("1-add player, 2-remove player, 3-display lineup, 4-save lineup")
         )
         if choice == 1:
-            number = int(input("Enter player's number"))
-            starting.append(lineup[number - 1])
+            numbers = input("Enter players numbers seperated by comma")
+            numbers = numbers.split(",")
+            for number in numbers:
+                lineup.append(squad[int(number) - 1])
         elif choice == 2:
             number = int(input("Enter player's number"))
-            starting.pop(number)
+            lineup.pop(number)
         elif choice == 4:
-            if len(starting) < 11:
-                print("Not enough players. Add ", 11 - len(starting), " more.")
+            if len(lineup) < 11:
+                print("Not enough players. Add ", 11 - len(lineup), " more.")
             else:
-                for i in starting:
+                for i in lineup:
                     rating = rating + int(i["RATING"])
                 rating = rating / 11
-                print(starting, " ", rating)
-                return (starting, rating)
+                print(lineup, " ", rating)
+                return (lineup, rating)
                 break
         else:
-            print(starting)
+            print(lineup)
 
 
 def contains(list, filter):
@@ -174,7 +176,7 @@ def contains(list, filter):
     return False
 
 
-def nextGame(matchday, current_team):
+def nextGame(matchday, current_team, lineup):
     print(matchday)
     file = open("fixtures.json")
     table = open("table.json")
@@ -184,13 +186,17 @@ def nextGame(matchday, current_team):
     for i in fixtures[matchday]:
         # players = playersFromTeam(i[0])
         if i[0] == current_team:
-            rating_home = current_team_rating
+            rating_home = lineup
+            rating_away = playersFromTeam(i[1])
+        elif i[1] == current_team:
+            rating_home = playersFromTeam(i[0])
+            rating_away = lineup
         else:
             rating_home = playersFromTeam(i[0])
             rating_away = playersFromTeam(i[1])
         print(i[0], " vs ", i[1])
-        print("home", rating_home, "away", rating_away)
-        if rating_home > rating_away:
+        # print("home", rating_home, "away", rating_away)
+        if rating_home[1] > rating_away[1]:
             print("WINNER: ", i[0])
             for t in table:
                 if t["team"] == i[0]:
@@ -217,10 +223,10 @@ def nextGame(matchday, current_team):
 # current_team = getTeam(current_manger)
 # playersFromTeam(current_team)
 # chooseLineup(current_team)
-# nextGame(matchday, current_team)
 # print(current_team)
 team = chooseTeam()
 pl = playersFromTeam(team)
 # pl = Squad(team).returnRating(team)
-chooseLineup(lineup=pl[0])
+lineup=chooseLineup(squad=pl[0])
+nextGame(1, team, lineup)
 # print(pl[0])
