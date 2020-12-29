@@ -169,11 +169,23 @@ def chooseLineup(squad):
             print(lineup)
 
 
-def contains(list, filter):
-    for x in list:
-        if filter(x):
-            return True
-    return False
+# def contains(list, filter):
+#     for x in list:
+#         if filter(x):
+#             return True
+#     return False
+
+
+def printStanding():
+    table = open("table.json")
+    table = json.load(table)
+    # print(json.dumps(table, sort_keys=True))
+    ordered_items = sorted(table, key=lambda item: item["points"], reverse=True)
+    pos=0
+    for i in ordered_items:
+        pos=pos+1
+        print(pos, i['team'],i['points'])
+    # print(ordered_items)
 
 
 def nextGame(matchday, current_team, lineup):
@@ -224,9 +236,10 @@ def nextGame(matchday, current_team, lineup):
 # playersFromTeam(current_team)
 # chooseLineup(current_team)
 # print(current_team)
-team = chooseTeam()
-pl = playersFromTeam(team)
+# team = chooseTeam()
+# pl = playersFromTeam(team)
 # pl = Squad(team).returnRating(team)
-lineup=chooseLineup(squad=pl[0])
-nextGame(1, team, lineup)
+# lineup=chooseLineup(squad=pl[0])
+# nextGame(1, team, lineup)
 # print(pl[0])
+printStanding()
