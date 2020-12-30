@@ -181,42 +181,42 @@ def printStanding():
     table = json.load(table)
     # print(json.dumps(table, sort_keys=True))
     ordered_items = sorted(table, key=lambda item: item["points"], reverse=True)
-    pos=0
+    pos = 0
     for i in ordered_items:
-        pos=pos+1
-        print(pos, i['team'],i['points'])
+        pos = pos + 1
+        print(pos, i["team"], i["points"])
     # print(ordered_items)
 
 
-def nextGame(matchday, current_team, lineup):
+def nextGameOld(matchday, current_team, lineup):
     print(matchday)
     file = open("fixtures.json")
     table = open("table.json")
     fixtures = json.load(file)
     table = json.load(table)
     data = []
-    for i in fixtures[matchday]:
-        # players = playersFromTeam(i[0])
-        if i[0] == current_team:
+    for team_name in fixtures[matchday]:
+        # players = playersFromTeam(team_name[0])
+        if team_name[0] == current_team:
             rating_home = lineup
-            rating_away = playersFromTeam(i[1])
-        elif i[1] == current_team:
-            rating_home = playersFromTeam(i[0])
+            rating_away = playersFromTeam(team_name[1])
+        elif team_name[1] == current_team:
+            rating_home = playersFromTeam(team_name[0])
             rating_away = lineup
         else:
-            rating_home = playersFromTeam(i[0])
-            rating_away = playersFromTeam(i[1])
-        print(i[0], " vs ", i[1])
-        # print("home", rating_home, "away", rating_away)
+            rating_home = playersFromTeam(team_name[0])
+            rating_away = playersFromTeam(team_name[1])
+        print(team_name[0], " vs ", team_name[1])
+        print("home", rating_home[1], "away", rating_away[1])
         if rating_home[1] > rating_away[1]:
-            print("WINNER: ", i[0])
+            print("WINNER: ", team_name[0])
             for t in table:
-                if t["team"] == i[0]:
+                if t["team"] == team_name[0]:
                     t["points"] = t["points"] + 3
         else:
-            print("WINNER: ", i[1])
+            print("WINNER: ", team_name[1])
             for t in table:
-                if t["team"] == i[1]:
+                if t["team"] == team_name[1]:
                     t["points"] = t["points"] + 3
         with open("table.json", "r+") as f:
             f.seek(0)
@@ -225,6 +225,73 @@ def nextGame(matchday, current_team, lineup):
         # with open('table.json', 'w') as outfile:
         #     json.dump(data, outfile)
 
+
+def getFieldRating(team, current_team):
+    if current_team:
+        players = team
+    else:
+        players = playersFromTeam(team)
+    forwards = []
+    forwards_rating = 0
+    midfielders = []
+    midfielders_rating = 0
+    defenders = []
+    defenders_rating = 0
+    for player in players[0]:
+        if player["FIELD"] == "FWD":
+            forwards.append(player)
+            forwards_rating = forwards_rating + int(player["RATING"])
+        elif player["FIELD"] == "MID":
+            midfielders.append(player)
+            midfielders_rating = midfielders_rating + int(player["RATING"])
+        elif player["FIELD"] == "DEF":
+            defenders.append(player)
+            defenders_rating = defenders_rating + int(player["RATING"])
+    forwards_rating=forwards_rating/len(forwards)
+    midfielders_rating=midfielders_rating/len(midfielders)
+    defenders_rating=defenders_rating/len(defenders)
+
+    forwards_rating=(forwards_rating+midfielders_rating)/2
+    defenders_rating=(defenders_rating+midfielders_rating)/2
+    return(forwards_rating, defenders_rating)
+    # print("fwd:", (forwards_rating+midfielders_rating)/2, "def:",(defenders_rating+midfielders_rating)/2)
+
+def nextGame(matchday, current_team, lineup):
+    print(matchday)
+    file = open("fixtures.json")
+    table = open("table.json")
+    fixtures = json.load(file)
+    table = json.load(table)
+    data = []
+    for team_name in fixtures[matchday]:
+        # players = playersFromTeam(team_name[0])
+        if team_name[0] == current_team:
+            rating_home = getFieldRating(lineup, True)
+            rating_away = getFieldRating(team_name[1], False)
+        elif team_name[1] == current_team:
+            rating_home = getFieldRating(team_name[0], False)
+            rating_away = getFieldRating(lineup, True)
+        else:
+            rating_home = getFieldRating(team_name[0], False)
+            rating_away = getFieldRating(team_name[1], False)
+        print(team_name[0], " vs ", team_name[1])
+        print("home", rating_home, "away", rating_away)
+        # if rating_home[1] > rating_away[1]:
+        #     print("WINNER: ", team_name[0])
+        #     for t in table:
+        #         if t["team"] == team_name[0]:
+        #             t["points"] = t["points"] + 3
+        # else:
+        #     print("WINNER: ", team_name[1])
+        #     for t in table:
+        #         if t["team"] == team_name[1]:
+        #             t["points"] = t["points"] + 3
+        # with open("table.json", "r+") as f:
+        #     f.seek(0)
+        #     f.truncate()
+        #     json.dump(table, f)
+        # with open('table.json', 'w') as outfile:
+        #     json.dump(data, outfile)
 
 # team = chooseTeam()
 # print(lineup)
@@ -236,10 +303,11 @@ def nextGame(matchday, current_team, lineup):
 # playersFromTeam(current_team)
 # chooseLineup(current_team)
 # print(current_team)
-# team = chooseTeam()
-# pl = playersFromTeam(team)
+team = chooseTeam()
+# getFieldRating(team)
+pl = playersFromTeam(team)
 # pl = Squad(team).returnRating(team)
-# lineup=chooseLineup(squad=pl[0])
-# nextGame(1, team, lineup)
+lineup=chooseLineup(squad=pl[0])
+nextGame(1, team, lineup)
 # print(pl[0])
-printStanding()
+# printStanding()
