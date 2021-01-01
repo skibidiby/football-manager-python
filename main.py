@@ -247,14 +247,34 @@ def getFieldRating(team, current_team):
         elif player["FIELD"] == "DEF":
             defenders.append(player)
             defenders_rating = defenders_rating + int(player["RATING"])
-    forwards_rating=forwards_rating/len(forwards)
-    midfielders_rating=midfielders_rating/len(midfielders)
-    defenders_rating=defenders_rating/len(defenders)
+    forwards_rating = forwards_rating / len(forwards)
+    midfielders_rating = midfielders_rating / len(midfielders)
+    defenders_rating = defenders_rating / len(defenders)
 
-    forwards_rating=(forwards_rating+midfielders_rating)/2
-    defenders_rating=(defenders_rating+midfielders_rating)/2
-    return(forwards_rating, defenders_rating)
+    forwards_rating = (forwards_rating + midfielders_rating) / 2
+    defenders_rating = (defenders_rating + midfielders_rating) / 2
+    return {
+        "forwards": len(forwards),
+        "forwards_rating": forwards_rating,
+        "defenders": len(defenders),
+        "defenders_rating": defenders_rating,
+    }
     # print("fwd:", (forwards_rating+midfielders_rating)/2, "def:",(defenders_rating+midfielders_rating)/2)
+
+
+def generateResult(outcome):
+    # population = [1, 2, 3, 4, 5, 6]
+    weights = [1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 5]
+    index=random.choice(weights)
+    outcome=abs(round(outcome))
+    if index>outcome:
+        home=index
+        away=index-outcome
+    else:
+        home=outcome
+        away=outcome-index
+    print(home,':',away)
+
 
 def nextGame(matchday, current_team, lineup):
     print(matchday)
@@ -275,23 +295,37 @@ def nextGame(matchday, current_team, lineup):
             rating_home = getFieldRating(team_name[0], False)
             rating_away = getFieldRating(team_name[1], False)
         print(team_name[0], " vs ", team_name[1])
-        print("home", rating_home, "away", rating_away)
-        # if rating_home[1] > rating_away[1]:
-        #     print("WINNER: ", team_name[0])
-        #     for t in table:
-        #         if t["team"] == team_name[0]:
-        #             t["points"] = t["points"] + 3
-        # else:
-        #     print("WINNER: ", team_name[1])
-        #     for t in table:
-        #         if t["team"] == team_name[1]:
-        #             t["points"] = t["points"] + 3
+        # print("home", rating_home['forwards'], "away", rating_away['defenders'])
+        ATT = (rating_home["forwards_rating"] - rating_away["defenders_rating"]) * (
+            rating_home["forwards"] / rating_away["defenders"]
+        )
+        DEF = (rating_home["defenders_rating"] - rating_away["forwards_rating"]) * (
+            rating_away["forwards"] / rating_home["defenders"]
+        )
+        outcome = ATT - DEF
+
+        if outcome < -0.5:
+            print("WINNER: ", team_name[0])
+            generateResult(outcome)
+            # for t in table:
+            #     if t["team"] == team_name[0]:
+            #         t["points"] = t["points"] + 3
+        elif outcome > 0.5:
+            print("WINNER: ", team_name[1])
+            generateResult(outcome)
+            # for t in table:
+            #     if t["team"] == team_name[1]:
+            #         t["points"] = t["points"] + 3
+        else:
+            print("DRAW")
+            generateResult(outcome)
         # with open("table.json", "r+") as f:
         #     f.seek(0)
         #     f.truncate()
         #     json.dump(table, f)
         # with open('table.json', 'w') as outfile:
         #     json.dump(data, outfile)
+
 
 # team = chooseTeam()
 # print(lineup)
@@ -307,7 +341,7 @@ team = chooseTeam()
 # getFieldRating(team)
 pl = playersFromTeam(team)
 # pl = Squad(team).returnRating(team)
-lineup=chooseLineup(squad=pl[0])
+lineup = chooseLineup(squad=pl[0])
 nextGame(1, team, lineup)
 # print(pl[0])
 # printStanding()
