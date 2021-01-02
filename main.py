@@ -265,15 +265,16 @@ def getFieldRating(team, current_team):
 def generateResult(outcome, winnerH):
     print(outcome)
     weights = [1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 5]
-    index=random.choice(weights)
-    outcome=abs(round(outcome))
+    index = random.choice(weights)
+    outcome = abs(round(outcome))
     if winnerH:
-        home=max(index, outcome)
-        away=max(index,outcome)-min(index,outcome)
+        home = max(index, outcome)
+        away = max(index, outcome) - min(index, outcome)
     else:
-        home=max(index,outcome)-min(index,outcome)
-        away=max(index, outcome)
-    print(home,':',away)
+        home = max(index, outcome) - min(index, outcome)
+        away = max(index, outcome)
+    print(home, ":", away)
+    return (home, away)
 
 
 def nextGame(matchday, current_team, lineup):
@@ -306,23 +307,42 @@ def nextGame(matchday, current_team, lineup):
 
         if outcome < -0.5:
             print("WINNER: ", team_name[0])
-            generateResult(outcome, True)
-            # for t in table:
-            #     if t["team"] == team_name[0]:
-            #         t["points"] = t["points"] + 3
+            result = generateResult(outcome, True)
+            for t in table:
+                if t["team"] == team_name[0]:
+                    t["points"] = t["points"] + 3
+                    t["GF"] = t["GF"] + result[0]
+                    t["GA"] = t["GA"] + result[1]
+                if t["team"] == team_name[1]:
+                    t["GA"] = t["GA"] + result[0]
+                    t["GF"] = t["GF"] + result[1]
         elif outcome > 0.5:
             print("WINNER: ", team_name[1])
-            generateResult(outcome, False)
-            # for t in table:
-            #     if t["team"] == team_name[1]:
-            #         t["points"] = t["points"] + 3
+            result = generateResult(outcome, False)
+            for t in table:
+                if t["team"] == team_name[1]:
+                    t["points"] = t["points"] + 3
+                    t["GF"] = t["GF"] + result[1]
+                    t["GA"] = t["GA"] + result[0]
+                if t["team"] == team_name[0]:
+                    t["GF"] = t["GF"] + result[0]
+                    t["GA"] = t["GA"] + result[1]
         else:
             print("DRAW")
-            generateResult(outcome, True)
-        # with open("table.json", "r+") as f:
-        #     f.seek(0)
-        #     f.truncate()
-        #     json.dump(table, f)
+            result = generateResult(outcome, True)
+            for t in table:
+                if t["team"] == team_name[0]:
+                    t["points"] = t["points"] + 1
+                    t["GF"] = t["GF"] + result[0]
+                    t["GA"] = t["GA"] + result[0]
+                if t["team"] == team_name[1]:
+                    t["points"] = t["points"] + 1
+                    t["GF"] = t["GF"] + result[0]
+                    t["GA"] = t["GA"] + result[0]
+        with open("table.json", "r+") as f:
+            f.seek(0)
+            f.truncate()
+            json.dump(table, f)
         # with open('table.json', 'w') as outfile:
         #     json.dump(data, outfile)
 
