@@ -75,7 +75,7 @@ def findTeam():
     for i in bundesliga_db:
         if not i["CLUB"] in teams:
             teams.append(i["CLUB"])
-    # print(teams)
+    print(teams)
     return teams
 
 
@@ -93,15 +93,10 @@ def logIn():
             break
 
 
-def getMatchday(current_manager):
+def getMatchday():
     file = open("manager.json")
     file = json.load(file)
-    name = current_manager["name"]
-    for i in range(len(file[0])):
-        if name in file[i]["name"]:
-            matchday = file[i]["matchday"]
-            return matchday
-            break
+    return file[0]["matchday"]
 
 
 def playersFromTeam(team):
@@ -253,7 +248,19 @@ def generateResult(outcome, winnerH):
     return (home, away)
 
 
-def nextGame(matchday, current_team, lineup):
+def saveMatchday(matchday, current_manager):
+    managers = open("manager.json")
+    managers = json.load(managers)
+    for manager in managers:
+        if manager["name"] == current_manager:
+            manager["matchday"] = matchday + 1
+    with open("manager.json", "r+") as f:
+        f.seek(0)
+        f.truncate()
+        json.dump(managers, f)
+
+
+def nextGame(matchday, current_team, lineup, current_manager):
     print(matchday)
     file = open("fixtures.json")
     table = open("table.json")
@@ -319,6 +326,7 @@ def nextGame(matchday, current_team, lineup):
             f.seek(0)
             f.truncate()
             json.dump(table, f)
+        saveMatchday(matchday, current_manager)
         # with open('table.json', 'w') as outfile:
         #     json.dump(data, outfile)
 
@@ -341,3 +349,4 @@ def nextGame(matchday, current_team, lineup):
 # pl = playersFromTeam(team)
 # lineup = chooseLineup(squad=pl[0])
 # nextGame(1, team, lineup)
+# saveMatchday(1,"vikic")

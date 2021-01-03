@@ -1,5 +1,5 @@
 import game
-
+import edit
 
 def interaction(message, choices_num):
     choice = input(message)
@@ -34,5 +34,22 @@ while True:
                     game.printStanding()
                 elif choice == 3:
                     game.nextGame(
-                        currentManager["matchday"], currentManager["team"], lineup
+                        currentManager["matchday"],
+                        currentManager["team"],
+                        lineup,
+                        currentManager["name"],
                     )
+        elif choice == 2:
+            name = input("Type manager's name")
+            password = input("Type new password")
+            team = game.chooseTeam()
+            matchday = game.getMatchday()
+            manager = game.Manager(name, team, password, matchday)
+            game.Manager.saveData(manager)
+    elif choice==2:
+        logged = edit.login()
+        if logged:
+            edit.editPlayer()
+        else:
+            logged = edit.login()
+            
