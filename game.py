@@ -93,10 +93,13 @@ def logIn():
             break
 
 
-def getMatchday():
+def getMatchday(name):
     file = open("manager.json")
     file = json.load(file)
-    return file[0]["matchday"]
+    for i in file:
+        if i["name"] == name:
+            return i["matchday"]
+    # return file[0]["matchday"]
 
 
 def playersFromTeam(team):
@@ -168,11 +171,13 @@ def chooseLineup(squad):
                 for i in lineup:
                     rating = rating + int(i["RATING"])
                 rating = rating / 11
-                print(lineup, " ", rating)
+                for i in lineup:
+                    print(i["NAME"], " ", i["POSITION"])
                 return (lineup, rating)
                 break
         else:
-            print(lineup)
+            for i in lineup:
+                print(i["NAME"], " ", i["POSITION"])
 
 
 # def contains(list, filter):
@@ -258,6 +263,7 @@ def saveMatchday(matchday, current_manager):
         f.seek(0)
         f.truncate()
         json.dump(managers, f)
+    return matchday
 
 
 def nextGame(matchday, current_team, lineup, current_manager):
@@ -326,7 +332,7 @@ def nextGame(matchday, current_team, lineup, current_manager):
             f.seek(0)
             f.truncate()
             json.dump(table, f)
-        saveMatchday(matchday, current_manager)
+        matchday = saveMatchday(matchday, current_manager)
         # with open('table.json', 'w') as outfile:
         #     json.dump(data, outfile)
 

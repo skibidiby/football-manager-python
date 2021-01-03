@@ -34,7 +34,7 @@ while True:
                     game.printStanding()
                 elif choice == 3:
                     game.nextGame(
-                        currentManager["matchday"],
+                        game.getMatchday(currentManager["name"]),
                         currentManager["team"],
                         lineup,
                         currentManager["name"],
